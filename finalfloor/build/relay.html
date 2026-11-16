@@ -1,0 +1,14 @@
+<!DOCTYPE html><meta charset="utf-8"><title>relay</title>
+<script>
+// Yalnız Play Console'a yükleme için: AAB'yi okuyup açan sayfaya iletir.
+const ok = /^https:\/\/play\.google\.com$/;
+window.addEventListener('message', async e => {
+  if (!ok.test(e.origin) || !e.data || !e.data.want) return;
+  try {
+    const r = await fetch(e.data.want + '?' + Date.now(), { cache: 'no-store' });
+    const buf = await r.arrayBuffer();
+    e.source.postMessage({ aab: buf, name: e.data.name }, e.origin, [buf]);
+  } catch (err) { e.source.postMessage({ err: String(err) }, e.origin); }
+});
+parent.postMessage({ ready: true }, '*');
+</script>
